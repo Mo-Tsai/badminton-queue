@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="羽球排隊">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFFUlEQVR4nO3d0VXbQBCF4SGHTtIFzaQ2mkkX1OI8ADEIy1rJu9qZe//vmWNW1q/R2hh4ulwulwBE/Jq9AKAngoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoaU59kLUPb775/mr317eR24Eh9MaEghaEghaEghaEjhReGKTC/oMq0lOyY0pBA0pBC0EPftRgRBr8oSx579M4ReFPLCqZ3yc8WE7oApmodM0NUmySzK0zlCKOg9mKi6LINWVHGajkDQCRBjP1JB9w5DLTT1/XOEWNB7VNhHV1hjNrZBQxNB44eq240IwaArn4yjWo7ZZfsiFzS8WQfdc2q5TMDsrIN24fB23SfJoHuelOon2I1k0ArYwhxD0MVxN/rOPmj1Sah+fEuyQStMG+wnGzQ8EfRAle4SldZ6D0HH9j6z6sl22z9HiAddNcRW6sd3hHTQZ+s1Ec+erEoXBkGLctxuRBA0xMgH3Xo7dZ1oauSDVtVr36u0f44g6GaVTrzz3YagIcUiaPbRt1W667SyCLoSt4uqN4IW435BEHRBiluFXmyCPiuCKhNS9aKwCbrVvSBHRNDzMatcTCMRNKQQNKRYBa26b9xL+XmwCrrVrL1oy/ddi5H98zuChhSCNqO83YgwDFr9hLqzC/pRGS8I9s9XBL2CSGoi6AFGXQyP3h0y3l16swxa6cRyJ/nOMuiMCLMPgjahdFe6h6DvYGrWYxv0IxMry7TjgvvpefYC1Cxjb43/8+vWIs1yEWVH0B2M+j8nvSaw08Vgu+VotfUbLCNjGf34iqyDrrKPvvW92D/fxpajsyOhjZ7yTgh6w1YQPSbl8jFaItx6EemKoFfci2p0RF8ffyvut5dXov7i6XK5XGYvYrbWCTkznJapfWt9blsOgo5rCBlDXtqzBXKLOYItx39V3knYuvjc99ZM6BUVgnCcwFsIeqFCyEuEfWX9g5WlijFH1F33CAT9oXoU1dffC0GHTgwqx/EI+6DVIlA7nr2sg1Y9+arH1cI2aPWTrn58ayyDdjnZLsf5lWXQ0GUXtNvUcjteq6DdTu4np+O2Chr6bIJ2mlK3uBy/TdDwYBG0y3Ta4vA8WAQNH/zGygB7Pp/sMDXPJP8B/zOCqfb/upV/IYAJ/YCR/8yeyX0MQR9wxoQj7GMIeocZt2rC3kf6XY6eEczed1bbp88iHXQvs2P+lGUdmRH0hmwRZVtPNgR9R9Z4sq4rA4JekT2a7OubhaAhhaBvqDL9qqzzTAQNKQQNKQS9UO02Xm29o0kHzcm+Tfl5kQ4afggaUggaUuSDVt4vHqH+fMgHDS8EvVDts8LV1juaRdDqt9lWDs+DRdDwYRO04t/K2LNOh+kcYRQ0PFgFrTSlmc63WQUdoRE1Ma+zC3qvbFFnW082lkHvnVpZItq7DrfpHGEadES9qIm5jfxfH91yJNQzY8m+vmzsg444Pn1HhpNxTRUQ9IdHthRZ/u6ce8wRBP1Nr33yjLcGifkdQS/MfvF3BDFfEfSKCmET8k+2b9ttyR5L9vXNwoRukGlaE/J9BL3DzLAJuQ1BH3Bm2IS8D0E/aETcRHwcQXfGj6rnImhI4W07SCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSPkHo4HZKI9/ZPwAAAAASUVORK5CYII=">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFFUlEQVR4nO3d0VXbQBCF4SGHTtIFzaQ2mkkX1OI8ADEIy1rJu9qZe//vmWNW1q/R2hh4ulwulwBE/Jq9AKAngoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoaU59kLUPb775/mr317eR24Eh9MaEghaEghaEghaEjhReGKTC/oMq0lOyY0pBA0pBC0EPftRgRBr8oSx579M4ReFPLCqZ3yc8WE7oApmodM0NUmySzK0zlCKOg9mKi6LINWVHGajkDQCRBjP1JB9w5DLTT1/XOEWNB7VNhHV1hjNrZBQxNB44eq240IwaArn4yjWo7ZZfsiFzS8WQfdc2q5TMDsrIN24fB23SfJoHuelOon2I1k0ArYwhxD0MVxN/rOPmj1Sah+fEuyQStMG+wnGzQ8EfRAle4SldZ6D0HH9j6z6sl22z9HiAddNcRW6sd3hHTQZ+s1Ec+erEoXBkGLctxuRBA0xMgH3Xo7dZ1oauSDVtVr36u0f44g6GaVTrzz3YagIcUiaPbRt1W667SyCLoSt4uqN4IW435BEHRBiluFXmyCPiuCKhNS9aKwCbrVvSBHRNDzMatcTCMRNKQQNKRYBa26b9xL+XmwCrrVrL1oy/ddi5H98zuChhSCNqO83YgwDFr9hLqzC/pRGS8I9s9XBL2CSGoi6AFGXQyP3h0y3l16swxa6cRyJ/nOMuiMCLMPgjahdFe6h6DvYGrWYxv0IxMry7TjgvvpefYC1Cxjb43/8+vWIs1yEWVH0B2M+j8nvSaw08Vgu+VotfUbLCNjGf34iqyDrrKPvvW92D/fxpajsyOhjZ7yTgh6w1YQPSbl8jFaItx6EemKoFfci2p0RF8ffyvut5dXov7i6XK5XGYvYrbWCTkznJapfWt9blsOgo5rCBlDXtqzBXKLOYItx39V3knYuvjc99ZM6BUVgnCcwFsIeqFCyEuEfWX9g5WlijFH1F33CAT9oXoU1dffC0GHTgwqx/EI+6DVIlA7nr2sg1Y9+arH1cI2aPWTrn58ayyDdjnZLsf5lWXQ0GUXtNvUcjteq6DdTu4np+O2Chr6bIJ2mlK3uBy/TdDwYBG0y3Ta4vA8WAQNH/zGygB7Pp/sMDXPJP8B/zOCqfb/upV/IYAJ/YCR/8yeyX0MQR9wxoQj7GMIeocZt2rC3kf6XY6eEczed1bbp88iHXQvs2P+lGUdmRH0hmwRZVtPNgR9R9Z4sq4rA4JekT2a7OubhaAhhaBvqDL9qqzzTAQNKQQNKQS9UO02Xm29o0kHzcm+Tfl5kQ4afggaUggaUuSDVt4vHqH+fMgHDS8EvVDts8LV1juaRdDqt9lWDs+DRdDwYRO04t/K2LNOh+kcYRQ0PFgFrTSlmc63WQUdoRE1Ma+zC3qvbFFnW082lkHvnVpZItq7DrfpHGEadES9qIm5jfxfH91yJNQzY8m+vmzsg444Pn1HhpNxTRUQ9IdHthRZ/u6ce8wRBP1Nr33yjLcGifkdQS/MfvF3BDFfEfSKCmET8k+2b9ttyR5L9vXNwoRukGlaE/J9BL3DzLAJuQ1BH3Bm2IS8D0E/aETcRHwcQXfGj6rnImhI4W07SCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSCFoSPkHo4HZKI9/ZPwAAAAASUVORK5CYII=">
+<title>羽球排隊</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh;padding-bottom:80px}
+header{background:#fff;border-bottom:1px solid #e0e0e0;padding:14px 18px 10px;position:sticky;top:0;z-index:100}
+header h1{font-size:17px;font-weight:900;color:#1a1a1a}
+header p{font-size:11px;color:#888;margin-top:2px}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e0e0e0;padding:0 16px}
+.tab{padding:10px 14px;font-size:13px;font-weight:700;color:#888;border-bottom:2px solid transparent;cursor:pointer}
+.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
+.sec{display:none;padding:14px}
+.sec.active{display:block}
+
+/* courts */
+.courts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.court{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:12px;position:relative}
+.court::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#1a1a1a;border-radius:14px 14px 0 0}
+.court.playing::before{background:#555}
+.cl{font-size:10px;font-weight:700;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:8px}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
+.slot{border-radius:7px;padding:7px 4px;font-size:11px;font-weight:700;text-align:center;color:#888;min-height:36px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px}
+.slot.L{background:#f0f4ff;border:1px solid #aac4f0}
+.slot.R{background:#fff4f0;border:1px solid #f0bca0}
+.slot.filled.L{border-color:#3a7fd5;color:#1a1a1a}
+.slot.filled.R{border-color:#d4622a;color:#1a1a1a}
+.slot .sk{font-size:9px;color:#888}
+.team-labels{display:flex;justify-content:space-between;font-size:9px;font-weight:700;margin-bottom:6px}
+.tl{color:#3a7fd5}.tr{color:#d4622a}
+.ctimer{font-size:10px;color:#888;text-align:center;margin-bottom:6px}
+.ctimer span{color:#555;font-weight:700}
+.cbtns{display:flex;gap:5px}
+.cbtn{flex:1;padding:6px 3px;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit}
+.cbtn:active{opacity:.75;transform:scale(.95)}
+.cbtn.s{background:#1a1a1a;color:#fff}
+.cbtn.e{background:#555;color:#fff}
+.cbtn.c{background:#f0f0f0;color:#888}
+
+/* queue */
+.qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.qtitle{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em}
+.qbadge{background:#1a1a1a;color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px}
+.qlist{display:flex;flex-direction:column;gap:7px}
+.qi{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.qi:active{transform:scale(.98)}
+.qi.sel{border-color:#1a1a1a;background:#f0f0f0}
+.qrank{width:26px;height:26px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#888;flex-shrink:0}
+.qrank.top{background:#1a1a1a;color:#fff}
+.qinfo{flex:1}
+.qname{font-size:13px;font-weight:700}
+.qmeta{font-size:10px;color:#888;margin-top:1px}
+.qmeta .w{color:#555}
+.qbdg{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;flex-shrink:0}
+.bdg-n{background:#f0f0f0;color:#888}
+
+/* skill dots */
+.sdot{display:inline-flex;gap:2px;margin-left:4px;vertical-align:middle}
+.sdot span{width:6px;height:6px;border-radius:50%;display:inline-block;background:#e0e0e0}
+.sdot.s1 span:nth-child(1){background:#888}
+.sdot.s2 span:nth-child(1),.sdot.s2 span:nth-child(2){background:#555}
+.sdot.s3 span{background:#1a1a1a}
+
+/* member panel */
+.mpanel{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:14px;margin-bottom:14px}
+.mpanel h3{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.irow{display:flex;gap:8px;margin-bottom:8px}
+input[type=text]{flex:1;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:9px;padding:10px 12px;font-size:13px;font-family:inherit;color:#1a1a1a;outline:none}
+input[type=text]:focus{border-color:#1a1a1a}
+input[type=text]::placeholder{color:#aaa}
+.btn-add{background:#1a1a1a;color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer;white-space:nowrap}
+.btn-add:active{transform:scale(.95)}
+.skill-sel{display:flex;gap:6px}
+.sk-opt{flex:1;padding:8px 4px;border:1px solid #e0e0e0;border-radius:8px;background:#f5f5f5;color:#888;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;text-align:center}
+.sk-opt.active{border-color:#1a1a1a;color:#1a1a1a;background:#e8e8e8}
+
+/* member list */
+.mlist{display:flex;flex-direction:column;gap:7px}
+.mi{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.mi.absent{opacity:.45}
+.mcheck{width:36px;height:36px;min-width:36px;min-height:36px;border-radius:8px;border:2px solid #e0e0e0;background:#f5f5f5;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.mcheck.on{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.mname{flex:1;font-size:13px;font-weight:700}
+.mdel{background:none;border:none;color:#ccc;font-size:24px;cursor:pointer;padding:8px;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+/* assign bar */
+.abar{background:#fff;border:1px solid #1a1a1a;border-radius:11px;padding:10px 12px;margin-bottom:10px;display:none}
+.abar.show{display:block}
+.abar p{font-size:11px;color:#1a1a1a;font-weight:700;margin-bottom:7px}
+.abtns{display:flex;gap:7px}
+.abtn{flex:1;padding:8px;border:1px solid #e0e0e0;border-radius:7px;background:#f5f5f5;color:#1a1a1a;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer}
+.abtn:active{background:#1a1a1a;color:#fff}
+
+/* stats */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.scard{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px;text-align:center}
+.snum{font-size:26px;font-weight:900;color:#1a1a1a}
+.slbl{font-size:10px;color:#888;margin-top:3px}
+.pslist{display:flex;flex-direction:column;gap:7px}
+.psi{background:#fff;border:1px solid #e0e0e0;border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.psn{flex:1;font-size:13px;font-weight:700}
+.psnums{display:flex;gap:8px}
+.psnum{text-align:center;min-width:32px}
+.psval{font-size:14px;font-weight:900;color:#1a1a1a}
+.pskey{font-size:9px;color:#888;margin-top:1px}
+.rbtn{background:none;border:1px solid #c0392b;border-radius:9px;padding:9px;color:#c0392b;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:14px}
+
+/* bottom */
+.bact{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 14px;display:flex;gap:8px;z-index:100}
+.bfull{flex:1;padding:12px;border:none;border-radius:11px;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer}
+.bfull:active{transform:scale(.97)}
+.bp{background:#1a1a1a;color:#fff}
+.bs{background:#f0f0f0;color:#888;border:1px solid #e0e0e0}
+
+/* toast */
+.toast{position:fixed;top:65px;left:50%;transform:translateX(-50%) translateY(-16px);background:#1a1a1a;color:#fff;padding:8px 18px;border-radius:28px;font-size:12px;font-weight:700;opacity:0;transition:all .25s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+.mbox{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:480px}
+.mtitle{font-size:14px;font-weight:900;text-align:center;margin-bottom:16px}
+.mteams{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mbtn{border:2px solid #e0e0e0;border-radius:14px;padding:16px 10px;cursor:pointer;font-family:inherit;text-align:center;background:#f5f5f5}
+.mbtn:active{transform:scale(.97)}
+.mbtn.mL{border-color:#3a7fd5}
+.mbtn.mR{border-color:#d4622a}
+.mwintag{font-size:10px;font-weight:700;display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px}
+.mwL{background:#ddeeff;color:#2266bb}
+.mwR{background:#ffeedd;color:#bb5522}
+.mnames{font-size:13px;font-weight:900;color:#1a1a1a;line-height:1.6}
+.mskill{font-size:10px;color:#888;margin-top:4px}
+.mcancel{width:100%;padding:11px;background:none;border:1px solid #e0e0e0;border-radius:11px;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.empty{text-align:center;padding:36px 16px;color:#888}
+.empty .ico{font-size:36px;margin-bottom:10px}
+.section-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏸 羽球排隊系統</h1>
+  <p id="stxt">就緒</p>
+</header>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('court')">場地</div>
+  <div class="tab" onclick="switchTab('members')">球員</div>
+  <div class="tab" onclick="switchTab('stats')">統計</div>
+</div>
+
+<!-- COURT TAB -->
+<div class="sec active" id="tab-court">
+  <div class="courts">
+    <div class="court" id="court-0">
+      <div class="cl">A 場</div>
+      <div class="slots">
+        <div class="slot L" id="s0-0"><span class="sn">空位</span></div>
+        <div class="slot R" id="s0-2"><span class="sn">空位</span></div>
+        <div class="slot L" id="s0-1"><span class="sn">空位</span></div>
+        <div class="slot R" id="s0-3"><span class="sn">空位</span></div>
+      </div>
+      <div class="team-labels"><span class="tl">● 左隊</span><span class="tr">右隊 ●</span></div>
+      <div class="ctimer" id="ct0">等待開始</div>
+      <div class="cbtns">
+        <button class="cbtn s" onclick="startCourt(0)">開始</button>
+        <button class="cbtn e" onclick="endGame(0)">結束</button>
+        <button class="cbtn c" onclick="clearCourt(0)">清場</button>
+      </div>
+    </div>
+    <div class="court" id="court-1">
+      <div class="cl">B 場</div>
+      <div class="slots">
+        <div class="slot L" id="s1-0"><span class="sn">空位</span></div>
+        <div class="slot R" id="s1-2"><span class="sn">空位</span></div>
+        <div class="slot L" id="s1-1"><span class="sn">空位</span></div>
+        <div class="slot R" id="s1-3"><span class="sn">空位</span></div>
+      </div>
+      <div class="team-labels"><span class="tl">● 左隊</span><span class="tr">右隊 ●</span></div>
+      <div class="ctimer" id="ct1">等待開始</div>
+      <div class="cbtns">
+        <button class="cbtn s" onclick="startCourt(1)">開始</button>
+        <button class="cbtn e" onclick="endGame(1)">結束</button>
+        <button class="cbtn c" onclick="clearCourt(1)">清場</button>
+      </div>
+    </div>
+  </div>
+  <div class="qhdr">
+    <div class="qtitle">候場順序</div>
+    <div class="qbadge" id="qb1">0 人</div>
+  </div>
+  <div class="abar" id="abar">
+    <p id="albl">選擇場地</p>
+    <div class="abtns">
+      <button class="abtn" onclick="assignTo(0)">上 A 場</button>
+      <button class="abtn" onclick="assignTo(1)">上 B 場</button>
+      <button class="abtn" onclick="cancelAssign()" style="flex:0;padding:8px 12px;color:#c0392b">✕</button>
+    </div>
+  </div>
+  <div class="qlist" id="cql"></div>
+</div>
+
+<!-- MEMBERS TAB -->
+<div class="sec" id="tab-members">
+  <div class="mpanel">
+    <h3>新增球員</h3>
+    <div class="irow">
+      <input type="text" id="pname" placeholder="姓名（最多8字）" maxlength="8" onkeypress="if(event.key==='Enter')addMember()">
+      <button class="btn-add" onclick="addMember()">加入</button>
+    </div>
+    <div class="skill-sel">
+      <button class="sk-opt active" data-sk="1" onclick="selSk(1)">● 一般</button>
+      <button class="sk-opt" data-sk="2" onclick="selSk(2)">●● 中等</button>
+      <button class="sk-opt" data-sk="3" onclick="selSk(3)">●●● 強</button>
+    </div>
+  </div>
+  <div class="qhdr">
+    <div class="qtitle">球員名單</div>
+    <div class="qbadge" id="mbadge">0 人</div>
+  </div>
+  <p style="font-size:11px;color:#888;margin-bottom:10px">打勾 = 今天有來，會出現在候場名單</p>
+  <div class="mlist" id="mlist"></div>
+</div>
+
+<!-- STATS TAB -->
+<div class="sec" id="tab-stats">
+  <div class="sgrid">
+    <div class="scard"><div class="snum" id="st0">0</div><div class="slbl">總球員</div></div>
+    <div class="scard"><div class="snum" id="st1">0</div><div class="slbl">已完場次</div></div>
+    <div class="scard"><div class="snum" id="st2">0</div><div class="slbl">今日出席</div></div>
+    <div class="scard"><div class="snum" id="st3">0</div><div class="slbl">場上人數</div></div>
+  </div>
+  <div class="qhdr" style="margin-bottom:10px"><div class="qtitle">個人統計</div></div>
+  <div class="pslist" id="psl"></div>
+  <button class="rbtn" onclick="doReset()">🗑 重置今日候場順序</button>
+</div>
+
+<!-- WIN MODAL -->
+<div class="modal" id="wmodal">
+  <div class="mbox">
+    <div class="mtitle" id="mtitle">哪隊贏了？</div>
+    <div class="mteams">
+      <button class="mbtn mL" onclick="confirmWin('L')">
+        <div><span class="mwintag mwL">左隊贏 👑</span></div>
+        <div class="mnames" id="mL"></div>
+        <div class="mskill" id="mLsk"></div>
+      </button>
+      <button class="mbtn mR" onclick="confirmWin('R')">
+        <div><span class="mwintag mwR">右隊贏 👑</span></div>
+        <div class="mnames" id="mR"></div>
+        <div class="mskill" id="mRsk"></div>
+      </button>
+    </div>
+    <button class="mcancel" onclick="cancelEnd()">取消（繼續比賽）</button>
+  </div>
+</div>
+
+<div class="bact">
+  <button class="bfull bs" onclick="autoFill()">⚡ 自動排場</button>
+  <button class="bfull bp" onclick="switchTab('members');setTimeout(()=>document.getElementById('pname').focus(),100)">＋ 新增球員</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"FIREBASE_API_KEY_REMOVED",
+  authDomain:"badminton-queue-d5c3f.firebaseapp.com",
+  databaseURL:"https://badminton-queue-d5c3f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"badminton-queue-d5c3f",
+  storageBucket:"badminton-queue-d5c3f.firebasestorage.app",
+  messagingSenderId:"542406284465",
+  appId:"1:542406284465:web:a24c4c2e7c63127675fe90"
+});
+const db = firebase.database();
+const dbRef = db.ref('badminton');
+
+// members = fixed roster, each has { id, name, skill, present, losses, wins }
+// courtPlayers = { courtId: [ {id, teamSlot} ] } — transient, not synced
+let members = [], totalGames = 0;
+let timers = {}, cStarts = {};
+let assignP = null, selSkill = 1;
+
+// court state is local only (not synced — each device manages their own view)
+let courtState = { 0: [], 1: [] }; // courtState[cid] = [{memberId, teamSlot}]
+
+function save() {
+  dbRef.set({ players: members, totalGames });
+}
+
+function load() {
+  dbRef.on('value', snap => {
+    const d = snap.val();
+    if (!d) { render(); return; }
+    members = (d.players || d.members || []);
+    totalGames = d.totalGames || 0;
+    render();
+  });
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function switchTab(t) {
+  ['court','members','stats'].forEach((x,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', x===t);
+    document.getElementById('tab-'+x).classList.toggle('active', x===t);
+  });
+  if (t==='stats') renderStats();
+}
+
+function selSk(v) {
+  selSkill = v;
+  document.querySelectorAll('.sk-opt').forEach(b => b.classList.toggle('active', +b.dataset.sk===v));
+}
+
+function skillDots(sk) {
+  return `<span class="sdot s${sk}"><span></span><span></span><span></span></span>`;
+}
+function skillText(sk) { return ['','●','●●','●●●'][sk]||''; }
+
+// ── Members ──
+function addMember() {
+  const inp = document.getElementById('pname'), name = inp.value.trim();
+  if (!name) { toast('請輸入姓名'); return; }
+  if (members.find(m => m.name === name)) { toast('姓名已存在'); return; }
+  members.push({ id: uid(), name, skill: selSkill, playing: true, lastPlayTime: 0 });
+  inp.value = ''; save(); render(); toast(name + ' 加入！');
+}
+
+function removeMember(id) {
+  const m = members.find(x => x.id === id);
+  if (getCourtMember(id)) { toast('球員正在場上'); return; }
+  if (!confirm('確定移除 ' + (m ? m.name : '') + '？')) return;
+  members = members.filter(x => x.id !== id);
+  // remove from court state too
+  [0,1].forEach(cid => { courtState[cid] = courtState[cid].filter(x => x.memberId !== id); });
+  save(); render();
+}
+
+function togglePresent(id) {
+  const m = members.find(x => x.id === id);
+  if (!m) return;
+  if (getCourtMember(id)) { toast('球員正在場上，無法更改出席'); return; }
+  m.playing = !m.playing;
+  save(); render();
+}
+
+// ── Court helpers ──
+function getCourtMember(memberId) {
+  for (let cid of [0,1]) {
+    const cs = courtState[cid].find(x => x.memberId === memberId);
+    if (cs) return { cid, ...cs };
+  }
+  return null;
+}
+
+function getCourtPlayers(cid) {
+  return courtState[cid].map(cs => {
+    const m = members.find(x => x.id === cs.memberId);
+    return m ? { ...m, teamSlot: cs.teamSlot } : null;
+  }).filter(Boolean);
+}
+
+function isOnCourt(memberId) {
+  return [0,1].some(cid => courtState[cid].some(x => x.memberId === memberId));
+}
+
+// ── Queue ──
+function getQueue() {
+  return members
+    .filter(m => m.playing && !isOnCourt(m.id))
+    .sort((a, b) => a.lastPlayTime - b.lastPlayTime);
+}
+
+// ── Balanced auto assign ──
+function balancedAssign(pool, freeSlots) {
+  const n = pool.length;
+  const Lslots = freeSlots.filter(s => s<=1);
+  const Rslots = freeSlots.filter(s => s>=2);
+  const Lcount = Lslots.length;
+  if (n===0 || Lcount===0) return;
+  let bestDiff = Infinity, bestCombo = null;
+  function combo(start, chosen) {
+    if (chosen.length === Lcount) {
+      const rest = pool.map((_,i)=>i).filter(i => !chosen.includes(i));
+      const diff = Math.abs(
+        chosen.reduce((s,i) => s+pool[i].skill, 0) -
+        rest.reduce((s,i) => s+pool[i].skill, 0)
+      );
+      if (diff < bestDiff) { bestDiff=diff; bestCombo=[...chosen]; }
+      return;
+    }
+    for (let i=start; i<n; i++) combo(i+1, [...chosen, i]);
+  }
+  combo(0, []);
+  if (!bestCombo) return;
+  bestCombo.forEach((idx,i) => { pool[idx]._slot = Lslots[i]; });
+  pool.map((_,i)=>i).filter(i=>!bestCombo.includes(i)).forEach((idx,i) => { pool[idx]._slot = Rslots[i]; });
+}
+
+function autoFill() {
+  const queue = getQueue(); let filled = 0;
+  [0,1].forEach(cid => {
+    const cp = getCourtPlayers(cid);
+    const needed = 4 - cp.length;
+    if (needed <= 0 || queue.length < needed) return;
+    const pool = queue.splice(0, needed);
+    const usedSlots = courtState[cid].map(x => x.teamSlot);
+    const freeSlots = [0,1,2,3].filter(s => !usedSlots.includes(s));
+    balancedAssign(pool, freeSlots);
+    pool.forEach(p => {
+      courtState[cid].push({ memberId: p.id, teamSlot: p._slot });
+      filled++;
+    });
+  });
+  render();
+  toast(filled > 0 ? '已安排 ' + filled + ' 位球員上場' : '沒有可排的球員');
+}
+
+// ── Court actions ──
+function startCourt(cid) {
+  if (getCourtPlayers(cid).length < 2) { toast('至少需要 2 位球員'); return; }
+  cStarts[cid] = Date.now();
+  clearInterval(timers[cid]);
+  timers[cid] = setInterval(() => {
+    const el = document.getElementById('ct' + cid);
+    if (!el || !cStarts[cid]) return;
+    const s = Math.floor((Date.now() - cStarts[cid]) / 1000);
+    el.innerHTML = '比賽中 <span>' + String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0') + '</span>';
+  }, 1000);
+  document.getElementById('court-' + cid).classList.add('playing');
+  toast((cid===0?'A':'B') + '場開始！');
+}
+
+function endGame(cid) {
+  const cp = getCourtPlayers(cid);
+  if (cp.length === 0) { toast('場上沒有球員'); return; }
+  clearInterval(timers[cid]);
+  // Don't touch the other court's timer
+  const Lteam = cp.filter(p => p.teamSlot <= 1);
+  const Rteam = cp.filter(p => p.teamSlot >= 2);
+  document.getElementById('mtitle').textContent = (cid===0?'A':'B') + '場結束 — 哪隊贏了？';
+  document.getElementById('mL').innerHTML = Lteam.map(p => p.name + ' ' + skillText(p.skill)).join('<br>') || '—';
+  document.getElementById('mR').innerHTML = Rteam.map(p => p.name + ' ' + skillText(p.skill)).join('<br>') || '—';
+  document.getElementById('mLsk').textContent = '總點數 ' + Lteam.reduce((s,p)=>s+p.skill,0);
+  document.getElementById('mRsk').textContent = '總點數 ' + Rteam.reduce((s,p)=>s+p.skill,0);
+  const modal = document.getElementById('wmodal');
+  modal.dataset.cid = cid;
+  modal.classList.add('show');
+}
+
+function confirmWin(side) {
+  const modal = document.getElementById('wmodal');
+  const cid = +modal.dataset.cid;
+  const cp = getCourtPlayers(cid);
+  cp.forEach(p => {
+    const isL = p.teamSlot <= 1;
+    const won = (side==='L' && isL) || (side==='R' && !isL);
+    const m = members.find(x => x.id === p.id);
+    if (m) {
+      m.lastPlayTime = Date.now();
+    }
+  });
+  totalGames++;
+  courtState[cid] = [];
+  cStarts[cid] = null;
+  modal.classList.remove('show');
+  document.getElementById('court-' + cid).classList.remove('playing');
+  document.getElementById('ct' + cid).textContent = '等待開始';
+  save(); render();
+  toast('記錄完成，球員回到候場');
+}
+
+function cancelEnd() {
+  const modal = document.getElementById('wmodal');
+  const cid = +modal.dataset.cid;
+  modal.classList.remove('show');
+  // restart timer for this court only
+  if (cStarts[cid]) {
+    timers[cid] = setInterval(() => {
+      const el = document.getElementById('ct' + cid);
+      if (!el || !cStarts[cid]) return;
+      const s = Math.floor((Date.now() - cStarts[cid]) / 1000);
+      el.innerHTML = '比賽中 <span>' + String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0') + '</span>';
+    }, 1000);
+  }
+}
+
+function clearCourt(cid) {
+  clearInterval(timers[cid]);
+  cStarts[cid] = null;
+  courtState[cid] = [];
+  document.getElementById('court-' + cid).classList.remove('playing');
+  document.getElementById('ct' + cid).textContent = '等待開始';
+  render(); toast('已清場');
+}
+
+// ── Manual assign ──
+function selectP(id) {
+  const m = members.find(x => x.id === id);
+  if (!m || isOnCourt(id)) return;
+  assignP = m;
+  document.getElementById('abar').classList.add('show');
+  document.getElementById('albl').textContent = m.name + ' → 選擇場地';
+  render();
+}
+
+function assignTo(cid) {
+  if (!assignP) return;
+  const cp = courtState[cid];
+  if (cp.length >= 4) { toast('場地已滿'); return; }
+  const usedSlots = cp.map(x => x.teamSlot);
+  const slot = [0,1,2,3].find(s => !usedSlots.includes(s));
+  cp.push({ memberId: assignP.id, teamSlot: slot });
+  toast(assignP.name + ' → ' + (cid===0?'A':'B') + '場 ' + (slot<=1?'左隊':'右隊'));
+  assignP = null;
+  document.getElementById('abar').classList.remove('show');
+  render();
+}
+
+function cancelAssign() {
+  assignP = null;
+  document.getElementById('abar').classList.remove('show');
+  render();
+}
+
+// ── Render ──
+function getWaitTxt(m) {
+  if (!m.lastPlayTime) return '新加入';
+  const min = Math.floor((Date.now() - m.lastPlayTime) / 60000);
+  return min < 1 ? '剛下場' : '等 ' + min + ' 分';
+}
+
+function renderSlots() {
+  [0,1].forEach(cid => {
+    [0,1,2,3].forEach(si => {
+      const el = document.getElementById('s' + cid + '-' + si);
+      if (!el) return;
+      const cs = courtState[cid].find(x => x.teamSlot === si);
+      const m = cs ? members.find(x => x.id === cs.memberId) : null;
+      if (m) {
+        el.classList.add('filled');
+        el.innerHTML = '<span class="sn">' + m.name + '</span><span class="sk">' + skillText(m.skill) + '</span>';
+      } else {
+        el.classList.remove('filled');
+        el.innerHTML = '<span class="sn">空位</span>';
+      }
+    });
+  });
+}
+
+function render() {
+  renderSlots();
+  const queue = getQueue();
+  const presentCount = members.filter(m => m.playing).length;
+  const onCourtCount = [0,1].reduce((s,cid) => s + courtState[cid].length, 0);
+
+  document.getElementById('qb1').textContent = queue.length + ' 人';
+  document.getElementById('mbadge').textContent = members.length + ' 人';
+  document.getElementById('stxt').textContent = '場上 ' + onCourtCount + ' 人 · 候場 ' + queue.length + ' 人 · 出席 ' + presentCount + ' 人';
+
+  // Court queue list
+  document.getElementById('cql').innerHTML = queue.length === 0
+    ? '<div class="empty"><div class="ico">🏸</div><p>點球員選場地，或按⚡自動排場</p></div>'
+    : queue.map((m,i) => `
+      <div class="qi${assignP&&assignP.id===m.id?' sel':''}" onclick="selectP('${m.id}')">
+        <div class="qrank${i<4?' top':''}">${i+1}</div>
+        <div class="qinfo">
+          <div class="qname">${m.name}${skillDots(m.skill)}</div>
+          <div class="qmeta"><span class="w">${getWaitTxt(m)}</span></div>
+        </div>
+        <div class="qbdg bdg-n">等待</div>
+      </div>`).join('');
+
+  // Members list
+  document.getElementById('mlist').innerHTML = members.length === 0
+    ? '<div class="empty"><div class="ico">👥</div><p>還沒有球員</p></div>'
+    : members.map(m => `
+      <div class="mi${m.playing?'':' absent'}">
+        <div class="mcheck${m.playing?' on':''}" onclick="togglePresent('${m.id}')">${m.playing?'✓':''}</div>
+        <div class="mname">${m.name}${skillDots(m.skill)}</div>
+        <button class="mdel" onclick="removeMember('${m.id}')">×</button>
+      </div>`).join('');
+}
+
+function renderStats() {
+  const onCourtCount = [0,1].reduce((s,cid) => s + courtState[cid].length, 0);
+  document.getElementById('st0').textContent = members.length;
+  document.getElementById('st1').textContent = totalGames;
+  document.getElementById('st2').textContent = members.filter(m=>m.playing).length;
+  document.getElementById('st3').textContent = onCourtCount;
+  const sorted = [...members].sort((a,b) => a.lastPlayTime - b.lastPlayTime);
+  document.getElementById('psl').innerHTML = sorted.length === 0
+    ? '<div class="empty"><div class="ico">📊</div><p>還沒有資料</p></div>'
+    : sorted.map(m => `
+      <div class="psi">
+        <div class="psn">${m.name}${skillDots(m.skill)}</div>
+        <div class="psnums">
+          <div class="psnum"><div class="psval">${m.playing?'出席':'缺席'}</div><div class="pskey">今日</div></div>
+          <div class="psnum"><div class="psval" style="font-size:11px;color:#888">${getWaitTxt(m)}</div><div class="pskey">狀態</div></div>
+        </div>
+      </div>`).join('');
+}
+
+function doReset() {
+  if (!confirm('重置今日候場順序？所有人重新排隊')) return;
+  members.forEach(m => { m.lastPlayTime=0; });
+  totalGames = 0;
+  save(); render(); toast('已重置');
+}
+
+load();
+</script>
+</body>
+</html>
