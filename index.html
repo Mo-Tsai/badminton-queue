@@ -459,22 +459,21 @@ input[type=text]::placeholder{color:var(--ink4)}
   <button class="rbtn" onclick="doReset()">🗑 重置今日候場順序</button>
 </div>
 
-<!-- WIN MODAL -->
+<!-- END MODAL -->
 <div class="modal" id="wmodal">
   <div class="mbox">
-    <div class="mtitle" id="mtitle">哪隊贏了？</div>
+    <div class="mtitle" id="mtitle">結束比賽</div>
     <div class="mteams">
-      <button class="mbtn mL" onclick="confirmWin('L')">
-        <div><span class="mwintag mwL">左隊贏 👑</span></div>
+      <div class="mbtn mL">
+        <div><span class="mwintag mwL">左隊</span></div>
         <div class="mnames" id="mL"></div>
-        <div class="mskill" id="mLsk"></div>
-      </button>
-      <button class="mbtn mR" onclick="confirmWin('R')">
-        <div><span class="mwintag mwR">右隊贏 👑</span></div>
+      </div>
+      <div class="mbtn mR">
+        <div><span class="mwintag mwR">右隊</span></div>
         <div class="mnames" id="mR"></div>
-        <div class="mskill" id="mRsk"></div>
-      </button>
+      </div>
     </div>
+    <button class="bfull bp" onclick="confirmEnd()" style="margin-bottom:8px;border-radius:9999px">確認下場，回到候場</button>
     <button class="mcancel" onclick="cancelEnd()">取消（繼續比賽）</button>
   </div>
 </div>
@@ -490,7 +489,7 @@ input[type=text]::placeholder{color:var(--ink4)}
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script>
 firebase.initializeApp({
-  apiKey:"FIREBASE_API_KEY_REMOVED",
+  apiKey:"AIzaSyBfaX4iqxL3fX5GqzxcYe4m58XnQppc-RQ",
   authDomain:"badminton-queue-d5c3f.firebaseapp.com",
   databaseURL:"https://badminton-queue-d5c3f-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId:"badminton-queue-d5c3f",
@@ -555,7 +554,7 @@ function addMember() {
   const inp = document.getElementById('pname'), name = inp.value.trim();
   if (!name) { toast('請輸入姓名'); return; }
   if (members.find(m => m.name === name)) { toast('姓名已存在'); return; }
-  members.push({ id: uid(), name, skill: selSkill, playing: true, lastPlayTime: 0 });
+  members.push({ id: uid(), name, skill: selSkill, playing: true, lastPlayTime: 0, gamesPlayed: 0 });
   inp.value = ''; save(); render(); toast(name + ' 加入！');
 }
 
@@ -601,7 +600,10 @@ function isOnCourt(memberId) {
 function getQueue() {
   return members
     .filter(m => m.playing && !isOnCourt(m.id))
-    .sort((a, b) => a.lastPlayTime - b.lastPlayTime);
+    .sort((a, b) =>
+      (a.gamesPlayed || 0) - (b.gamesPlayed || 0) ||
+      a.lastPlayTime - b.lastPlayTime
+    );
 }
 
 // ── Balanced auto assign ──
@@ -671,26 +673,24 @@ function endGame(cid) {
   // Don't touch the other court's timer
   const Lteam = cp.filter(p => p.teamSlot <= 1);
   const Rteam = cp.filter(p => p.teamSlot >= 2);
-  document.getElementById('mtitle').textContent = (cid===0?'A':'B') + '場結束 — 哪隊贏了？';
-  document.getElementById('mL').innerHTML = Lteam.map(p => p.name + ' ' + skillText(p.skill)).join('<br>') || '—';
-  document.getElementById('mR').innerHTML = Rteam.map(p => p.name + ' ' + skillText(p.skill)).join('<br>') || '—';
-  document.getElementById('mLsk').textContent = '總點數 ' + Lteam.reduce((s,p)=>s+p.skill,0);
-  document.getElementById('mRsk').textContent = '總點數 ' + Rteam.reduce((s,p)=>s+p.skill,0);
+  document.getElementById('mtitle').textContent = (cid===0?'A':'B') + '場結束';
+  document.getElementById('mL').innerHTML = Lteam.map(p => p.name + skillDots(p.skill)).join('<br>') || '—';
+  document.getElementById('mR').innerHTML = Rteam.map(p => p.name + skillDots(p.skill)).join('<br>') || '—';
   const modal = document.getElementById('wmodal');
   modal.dataset.cid = cid;
   modal.classList.add('show');
 }
 
-function confirmWin(side) {
+function confirmEnd() {
   const modal = document.getElementById('wmodal');
   const cid = +modal.dataset.cid;
   const cp = getCourtPlayers(cid);
+  const now = Date.now();
   cp.forEach(p => {
-    const isL = p.teamSlot <= 1;
-    const won = (side==='L' && isL) || (side==='R' && !isL);
     const m = members.find(x => x.id === p.id);
     if (m) {
-      m.lastPlayTime = Date.now();
+      m.lastPlayTime = now;
+      m.gamesPlayed = (m.gamesPlayed || 0) + 1;
     }
   });
   totalGames++;
@@ -700,7 +700,7 @@ function confirmWin(side) {
   document.getElementById('court-' + cid).classList.remove('playing');
   document.getElementById('ct' + cid).textContent = '等待開始';
   save(); render();
-  toast('記錄完成，球員回到候場');
+  toast('球員已回到候場');
 }
 
 function cancelEnd() {
@@ -799,7 +799,7 @@ function render() {
         <div class="qrank${i<4?' top':''}">${i+1}</div>
         <div class="qinfo">
           <div class="qname">${m.name}${skillDots(m.skill)}</div>
-          <div class="qmeta"><span class="w">${getWaitTxt(m)}</span></div>
+          <div class="qmeta"><span class="w">${getWaitTxt(m)}</span> · ${m.gamesPlayed || 0} 場</div>
         </div>
         <div class="qbdg bdg-n">等待</div>
       </div>`).join('');
@@ -821,22 +821,25 @@ function renderStats() {
   document.getElementById('st1').textContent = totalGames;
   document.getElementById('st2').textContent = members.filter(m=>m.playing).length;
   document.getElementById('st3').textContent = onCourtCount;
-  const sorted = [...members].sort((a,b) => a.lastPlayTime - b.lastPlayTime);
+  const sorted = [...members].sort((a,b) =>
+    (a.gamesPlayed || 0) - (b.gamesPlayed || 0) ||
+    a.lastPlayTime - b.lastPlayTime
+  );
   document.getElementById('psl').innerHTML = sorted.length === 0
     ? '<div class="empty"><div class="ico">📊</div><p>還沒有資料</p></div>'
     : sorted.map(m => `
       <div class="psi">
         <div class="psn">${m.name}${skillDots(m.skill)}</div>
         <div class="psnums">
+          <div class="psnum"><div class="psval">${m.gamesPlayed || 0}</div><div class="pskey">已上場</div></div>
           <div class="psnum"><div class="psval">${m.playing?'出席':'缺席'}</div><div class="pskey">今日</div></div>
-          <div class="psnum"><div class="psval" style="font-size:11px;color:#888">${getWaitTxt(m)}</div><div class="pskey">狀態</div></div>
         </div>
       </div>`).join('');
 }
 
 function doReset() {
   if (!confirm('重置今日候場順序？所有人重新排隊')) return;
-  members.forEach(m => { m.lastPlayTime=0; });
+  members.forEach(m => { m.lastPlayTime = 0; m.gamesPlayed = 0; });
   totalGames = 0;
   save(); render(); toast('已重置');
 }
