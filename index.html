@@ -602,7 +602,7 @@ function getQueue() {
     .filter(m => m.playing && !isOnCourt(m.id))
     .sort((a, b) =>
       (a.gamesPlayed || 0) - (b.gamesPlayed || 0) ||
-      a.lastPlayTime - b.lastPlayTime
+      (a.lastPlayTime || 0) - (b.lastPlayTime || 0)
     );
 }
 
@@ -822,8 +822,8 @@ function renderStats() {
   document.getElementById('st2').textContent = members.filter(m=>m.playing).length;
   document.getElementById('st3').textContent = onCourtCount;
   const sorted = [...members].sort((a,b) =>
-    (a.gamesPlayed || 0) - (b.gamesPlayed || 0) ||
-    a.lastPlayTime - b.lastPlayTime
+    (b.gamesPlayed || 0) - (a.gamesPlayed || 0) ||
+    (b.lastPlayTime || 0) - (a.lastPlayTime || 0)
   );
   document.getElementById('psl').innerHTML = sorted.length === 0
     ? '<div class="empty"><div class="ico">📊</div><p>還沒有資料</p></div>'
