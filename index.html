@@ -612,7 +612,11 @@ function balancedAssign(pool, freeSlots) {
   const Lslots = freeSlots.filter(s => s<=1);
   const Rslots = freeSlots.filter(s => s>=2);
   const Lcount = Lslots.length;
-  if (n===0 || Lcount===0) return;
+  if (n===0) return;
+  if (Lcount===0) {
+    pool.forEach((p, i) => { p._slot = Rslots[i]; });
+    return;
+  }
   let bestDiff = Infinity, bestCombo = null;
   function combo(start, chosen) {
     if (chosen.length === Lcount) {
