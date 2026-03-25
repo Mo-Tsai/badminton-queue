@@ -72,9 +72,43 @@ header p{
 .sec{display:none;padding:14px}
 .sec.active{display:block}
 
+/* ── Court controls ── */
+.court-wrap{margin-bottom:14px}
+.court-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;padding:0 2px;
+}
+.court-ctrl-btn{
+  width:32px;height:32px;border-radius:9999px;border:none;
+  background:var(--surface);
+  box-shadow:0 0 0 2px var(--court-line),inset 0 0 0 1px var(--ring);
+  font-size:20px;line-height:1;color:var(--ink);
+  cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;
+}
+.court-ctrl-btn:disabled{opacity:0.35;cursor:default}
+.court-ctrl-btn:not(:disabled):active{transform:scale(.92)}
+.court-count-lbl{
+  font-size:11px;font-weight:600;color:var(--ink2);
+  font-family:ui-monospace,monospace;text-transform:uppercase;letter-spacing:0.08em;
+}
+/* ── Court carousel ── */
+.court-track{
+  display:flex;
+  overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:6px 6px 8px;margin:-6px -6px 0;
+}
+.court-track::-webkit-scrollbar{display:none}
+.court-dots{display:flex;justify-content:center;gap:6px;margin-top:10px;height:8px}
+.court-dot{
+  height:6px;width:6px;border-radius:3px;
+  background:var(--ring-md);
+  transition:width .25s,background .25s;
+}
+.court-dot.active{width:18px;background:var(--green)}
 /* ── Courts ── */
-.courts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .court{
+  flex:0 0 100%;scroll-snap-align:start;
   background:var(--surface);
   border-radius:16px;
   padding:12px;
@@ -376,39 +410,14 @@ input[type=text]::placeholder{color:var(--ink4)}
 
 <!-- COURT TAB -->
 <div class="sec active" id="tab-court">
-  <div class="courts">
-    <div class="court" id="court-0">
-      <div class="cl">A 場</div>
-      <div class="slots">
-        <div class="slot L" id="s0-0"><span class="sn">空位</span></div>
-        <div class="slot R" id="s0-2"><span class="sn">空位</span></div>
-        <div class="slot L" id="s0-1"><span class="sn">空位</span></div>
-        <div class="slot R" id="s0-3"><span class="sn">空位</span></div>
-      </div>
-      <div class="team-labels"><span class="tl">● 左隊</span><span class="tr">右隊 ●</span></div>
-      <div class="ctimer" id="ct0">等待開始</div>
-      <div class="cbtns">
-        <button class="cbtn s" onclick="startCourt(0)">開始</button>
-        <button class="cbtn e" onclick="endGame(0)">結束</button>
-        <button class="cbtn c" onclick="clearCourt(0)">清場</button>
-      </div>
+  <div class="court-wrap">
+    <div class="court-controls">
+      <button class="court-ctrl-btn" id="btn-rm-court" onclick="removeCourt()" disabled>−</button>
+      <span class="court-count-lbl" id="court-count-lbl">共 2 場</span>
+      <button class="court-ctrl-btn" id="btn-add-court" onclick="addCourt()">＋</button>
     </div>
-    <div class="court" id="court-1">
-      <div class="cl">B 場</div>
-      <div class="slots">
-        <div class="slot L" id="s1-0"><span class="sn">空位</span></div>
-        <div class="slot R" id="s1-2"><span class="sn">空位</span></div>
-        <div class="slot L" id="s1-1"><span class="sn">空位</span></div>
-        <div class="slot R" id="s1-3"><span class="sn">空位</span></div>
-      </div>
-      <div class="team-labels"><span class="tl">● 左隊</span><span class="tr">右隊 ●</span></div>
-      <div class="ctimer" id="ct1">等待開始</div>
-      <div class="cbtns">
-        <button class="cbtn s" onclick="startCourt(1)">開始</button>
-        <button class="cbtn e" onclick="endGame(1)">結束</button>
-        <button class="cbtn c" onclick="clearCourt(1)">清場</button>
-      </div>
-    </div>
+    <div class="court-track" id="court-track"></div>
+    <div class="court-dots" id="court-dots"></div>
   </div>
   <div class="qhdr">
     <div class="qtitle">候場順序</div>
@@ -416,11 +425,7 @@ input[type=text]::placeholder{color:var(--ink4)}
   </div>
   <div class="abar" id="abar">
     <p id="albl">選擇場地</p>
-    <div class="abtns">
-      <button class="abtn" onclick="assignTo(0)">上 A 場</button>
-      <button class="abtn" onclick="assignTo(1)">上 B 場</button>
-      <button class="abtn" onclick="cancelAssign()" style="flex:0;padding:8px 12px;color:#c0392b">✕</button>
-    </div>
+    <div class="abtns" id="assign-btns"></div>
   </div>
   <div class="qlist" id="cql"></div>
 </div>
@@ -502,25 +507,92 @@ const db = firebase.database();
 const dbRef = db.ref('badminton');
 
 // members = fixed roster, each has { id, name, skill, present, losses, wins }
-// courtPlayers = { courtId: [ {id, teamSlot} ] } — transient, not synced
-let members = [], totalGames = 0;
+let members = [], totalGames = 0, numCourts = 2;
 let timers = {}, cStarts = {};
 let assignP = null, selSkill = 1;
+const COURT_NAMES = ['A','B','C','D'];
 
 // court state is local only (not synced — each device manages their own view)
-let courtState = { 0: [], 1: [] }; // courtState[cid] = [{memberId, teamSlot}]
+let courtState = {}; // courtState[cid] = [{memberId, teamSlot}]
+function courtIds() { return Array.from({length: numCourts}, (_, i) => i); }
+function initCourtState() {
+  for (let i = 0; i < 4; i++) { if (!courtState[i]) courtState[i] = []; }
+}
+
+function renderCourts() {
+  const track = document.getElementById('court-track');
+  if (!track) return;
+  track.innerHTML = courtIds().map(cid => `
+    <div class="court" id="court-${cid}">
+      <div class="cl">${COURT_NAMES[cid]} 場</div>
+      <div class="slots">
+        <div class="slot L" id="s${cid}-0"><span class="sn">空位</span></div>
+        <div class="slot R" id="s${cid}-2"><span class="sn">空位</span></div>
+        <div class="slot L" id="s${cid}-1"><span class="sn">空位</span></div>
+        <div class="slot R" id="s${cid}-3"><span class="sn">空位</span></div>
+      </div>
+      <div class="team-labels"><span class="tl">● 左隊</span><span class="tr">右隊 ●</span></div>
+      <div class="ctimer" id="ct${cid}">等待開始</div>
+      <div class="cbtns">
+        <button class="cbtn s" onclick="startCourt(${cid})">開始</button>
+        <button class="cbtn e" onclick="endGame(${cid})">結束</button>
+        <button class="cbtn c" onclick="clearCourt(${cid})">清場</button>
+      </div>
+    </div>`).join('');
+  // dots
+  document.getElementById('court-dots').innerHTML = courtIds().map(i =>
+    `<div class="court-dot${i===0?' active':''}" data-i="${i}"></div>`).join('');
+  // controls
+  document.getElementById('btn-rm-court').disabled  = numCourts <= 1;
+  document.getElementById('btn-add-court').disabled = numCourts >= 4;
+  document.getElementById('court-count-lbl').textContent = `共 ${numCourts} 場`;
+  // assign buttons
+  document.getElementById('assign-btns').innerHTML =
+    courtIds().map(cid => `<button class="abtn" onclick="assignTo(${cid})">上 ${COURT_NAMES[cid]} 場</button>`).join('') +
+    `<button class="abtn" onclick="cancelAssign()" style="flex:0;padding:8px 12px;color:var(--walnut)">✕</button>`;
+  // dot sync on scroll
+  track.onscroll = () => {
+    const idx = Math.round(track.scrollLeft / track.clientWidth);
+    document.querySelectorAll('.court-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  };
+  renderSlots();
+}
+
+function addCourt() {
+  if (numCourts >= 4) return;
+  numCourts++;
+  save(); renderCourts(); render();
+  // scroll to new court
+  const t = document.getElementById('court-track');
+  setTimeout(() => t.scrollTo({left: (numCourts-1)*t.clientWidth, behavior:'smooth'}), 50);
+  toast(COURT_NAMES[numCourts-1] + ' 場已加入');
+}
+
+function removeCourt() {
+  if (numCourts <= 1) return;
+  const last = numCourts - 1;
+  if (courtState[last] && courtState[last].length > 0) {
+    toast('請先清空 ' + COURT_NAMES[last] + ' 場'); return;
+  }
+  clearInterval(timers[last]); timers[last] = null; cStarts[last] = null; courtState[last] = [];
+  numCourts--;
+  save(); renderCourts(); render();
+  toast(COURT_NAMES[numCourts] + ' 場已移除');
+}
 
 function save() {
-  dbRef.set({ players: members, totalGames });
+  dbRef.set({ players: members, totalGames, numCourts });
 }
 
 function load() {
   dbRef.on('value', snap => {
     const d = snap.val();
-    if (!d) { render(); return; }
+    if (!d) { initCourtState(); renderCourts(); render(); return; }
     members = (d.players || d.members || []);
     totalGames = d.totalGames || 0;
-    render();
+    numCourts = d.numCourts || 2;
+    initCourtState();
+    renderCourts(); render();
   });
 }
 
@@ -564,8 +636,7 @@ function removeMember(id) {
   if (getCourtMember(id)) { toast('球員正在場上'); return; }
   if (!confirm('確定移除 ' + (m ? m.name : '') + '？')) return;
   members = members.filter(x => x.id !== id);
-  // remove from court state too
-  [0,1].forEach(cid => { courtState[cid] = courtState[cid].filter(x => x.memberId !== id); });
+  courtIds().forEach(cid => { courtState[cid] = courtState[cid].filter(x => x.memberId !== id); });
   save(); render();
 }
 
@@ -579,7 +650,7 @@ function togglePresent(id) {
 
 // ── Court helpers ──
 function getCourtMember(memberId) {
-  for (let cid of [0,1]) {
+  for (let cid of courtIds()) {
     const cs = courtState[cid].find(x => x.memberId === memberId);
     if (cs) return { cid, ...cs };
   }
@@ -594,7 +665,7 @@ function getCourtPlayers(cid) {
 }
 
 function isOnCourt(memberId) {
-  return [0,1].some(cid => courtState[cid].some(x => x.memberId === memberId));
+  return courtIds().some(cid => courtState[cid].some(x => x.memberId === memberId));
 }
 
 // ── Queue ──
@@ -676,7 +747,7 @@ function autoFill() {
   }
 
   const queue = raw; let filled = 0;
-  [0,1].forEach(cid => {
+  courtIds().forEach(cid => {
     const cp = getCourtPlayers(cid);
     const needed = 4 - cp.length;
     if (needed <= 0 || queue.length < needed) return;
@@ -824,7 +895,7 @@ function getWaitTxt(m) {
 }
 
 function renderSlots() {
-  [0,1].forEach(cid => {
+  courtIds().forEach(cid => {
     [0,1,2,3].forEach(si => {
       const el = document.getElementById('s' + cid + '-' + si);
       if (!el) return;
@@ -845,7 +916,7 @@ function render() {
   renderSlots();
   const queue = getQueue();
   const presentCount = members.filter(m => m.playing).length;
-  const onCourtCount = [0,1].reduce((s,cid) => s + courtState[cid].length, 0);
+  const onCourtCount = courtIds().reduce((s,cid) => s + courtState[cid].length, 0);
 
   document.getElementById('qb1').textContent = queue.length + ' 人';
   document.getElementById('mbadge').textContent = members.length + ' 人';
@@ -876,7 +947,7 @@ function render() {
 }
 
 function renderStats() {
-  const onCourtCount = [0,1].reduce((s,cid) => s + courtState[cid].length, 0);
+  const onCourtCount = courtIds().reduce((s,cid) => s + courtState[cid].length, 0);
   document.getElementById('st0').textContent = members.length;
   document.getElementById('st1').textContent = totalGames;
   document.getElementById('st2').textContent = members.filter(m=>m.playing).length;
