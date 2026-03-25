@@ -48,19 +48,24 @@ body{
 /* ── Header ── */
 header{
   background:var(--surface);
-  box-shadow:inset 0 -1px 0 var(--ring);
-  padding:14px 18px 10px;
+  padding:16px 18px 0;
   position:sticky;top:0;z-index:100;
+  text-align:center;
 }
-header h1{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:-0.02em}
+header h1{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.02em}
 header p{
-  font-size:10px;color:var(--ink3);margin-top:3px;
+  font-size:10px;color:var(--ink3);margin-top:4px;
   font-family:ui-monospace,monospace;
   text-transform:uppercase;letter-spacing:0.08em;
 }
 
-/* ── Tabs ── */
-.tabs{display:flex;background:var(--surface);box-shadow:inset 0 -1px 0 var(--ring);padding:0 16px}
+/* ── Tabs (forms bottom of header card) ── */
+.tabs{
+  display:flex;background:var(--surface);padding:0 16px;
+  border-radius:0 0 22px 22px;
+  box-shadow:0 0 0 3px var(--court-line),0 6px 16px rgba(28,20,8,0.12);
+  margin-bottom:4px;
+}
 .tab{
   padding:10px 14px;
   font-size:10px;font-weight:600;color:var(--ink3);
@@ -256,11 +261,42 @@ input[type=text]::placeholder{color:var(--ink4)}
 /* ── Member list ── */
 .mlist{display:flex;flex-direction:column;gap:6px}
 .mi{
-  background:var(--surface);border-radius:12px;
+  background:var(--surface);border-radius:14px;
   padding:10px 12px;display:flex;align-items:center;gap:10px;
   box-shadow:0 0 0 2px var(--court-line),inset 0 0 0 1px var(--ring);
+  transition:opacity .2s;
 }
-.mi.absent{opacity:.4}
+.mi.absent{opacity:.38}
+/* Inline edit state */
+.mi.editing{flex-direction:column;align-items:stretch;gap:8px;padding:12px}
+.edit-row{display:flex;gap:8px;align-items:center}
+.edit-inp{
+  flex:1;background:var(--surface2);border:none;
+  box-shadow:inset 0 0 0 2px var(--green);
+  border-radius:9999px;
+  padding:8px 12px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;
+}
+.edit-skills{display:flex;gap:4px}
+.edit-sk{
+  padding:6px 9px;border:none;
+  box-shadow:inset 0 0 0 1px var(--ring-md);
+  border-radius:9999px;background:var(--surface2);
+  color:var(--ink2);font-size:10px;font-weight:700;
+  font-family:inherit;cursor:pointer;white-space:nowrap;
+}
+.edit-sk.active{box-shadow:inset 0 0 0 2px var(--green);color:var(--green);background:var(--green-bg)}
+.edit-actions{display:flex;gap:6px}
+.edit-save{
+  flex:1;padding:8px;border:none;border-radius:9999px;
+  background:var(--green);color:#fff;
+  font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;
+}
+.edit-cancel{
+  padding:8px 14px;border:none;border-radius:9999px;
+  background:var(--surface2);color:var(--ink2);
+  box-shadow:inset 0 0 0 1px var(--ring-md);
+  font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;
+}
 .mcheck{
   width:36px;height:36px;min-width:36px;min-height:36px;
   border-radius:9px;border:none;
@@ -293,14 +329,14 @@ input[type=text]::placeholder{color:var(--ink4)}
 .abtn:active{background:var(--ink);color:var(--surface)}
 
 /* ── Stats ── */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .scard{
-  background:var(--surface);border-radius:14px;padding:12px;text-align:center;
+  background:var(--surface);border-radius:20px;padding:16px 12px;text-align:center;
   box-shadow:0 0 0 2px var(--court-line),inset 0 0 0 1px var(--ring);
 }
-.snum{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.03em}
+.snum{font-size:30px;font-weight:700;color:var(--ink);letter-spacing:-0.04em}
 .slbl{
-  font-size:10px;color:var(--ink3);margin-top:3px;
+  font-size:10px;color:var(--ink3);margin-top:4px;
   font-family:ui-monospace,monospace;text-transform:uppercase;letter-spacing:0.06em;
 }
 .pslist{display:flex;flex-direction:column;gap:6px}
@@ -446,9 +482,12 @@ input[type=text]::placeholder{color:var(--ink4)}
   </div>
   <div class="qhdr">
     <div class="qtitle">球員名單</div>
-    <div class="qbadge" id="mbadge">0 人</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onclick="clearAllPresent()" style="background:var(--surface2);border:none;box-shadow:inset 0 0 0 1px var(--ring-md);border-radius:9999px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--ink2);font-family:inherit;cursor:pointer;">全不勾</button>
+      <div class="qbadge" id="mbadge">0 人</div>
+    </div>
   </div>
-  <p style="font-size:11px;color:#888;margin-bottom:10px">打勾 = 今天有來，會出現在候場名單</p>
+  <p style="font-size:11px;color:var(--ink3);margin-bottom:10px">打勾 = 今天有來 · 點名字可修改</p>
   <div class="mlist" id="mlist"></div>
 </div>
 
@@ -510,6 +549,7 @@ const dbRef = db.ref('badminton');
 let members = [], totalGames = 0, numCourts = 2;
 let timers = {}, cStarts = {};
 let assignP = null, selSkill = 1;
+let editingId = null, editSkill = 1;
 const COURT_NAMES = ['A','B','C','D'];
 
 // court state is local only (not synced — each device manages their own view)
@@ -647,6 +687,41 @@ function togglePresent(id) {
   m.playing = !m.playing;
   save(); render();
 }
+
+function clearAllPresent() {
+  let changed = false;
+  members.forEach(m => {
+    if (m.playing && !getCourtMember(m.id)) { m.playing = false; changed = true; }
+  });
+  if (changed) { save(); render(); toast('已全部取消出席'); }
+  else toast('沒有可取消的球員');
+}
+
+function startEdit(id) {
+  const m = members.find(x => x.id === id);
+  if (!m) return;
+  editingId = id; editSkill = m.skill;
+  render();
+  requestAnimationFrame(() => {
+    const inp = document.getElementById('edit-inp-' + id);
+    if (inp) { inp.focus(); inp.select(); }
+  });
+}
+
+function setEditSkill(sk) { editSkill = sk; render(); }
+
+function saveEdit() {
+  const m = members.find(x => x.id === editingId);
+  if (!m) { editingId = null; render(); return; }
+  const inp = document.getElementById('edit-inp-' + editingId);
+  const newName = inp ? inp.value.trim() : m.name;
+  if (!newName) { toast('請輸入姓名'); return; }
+  if (members.find(x => x.id !== editingId && x.name === newName)) { toast('姓名已存在'); return; }
+  m.name = newName; m.skill = editSkill;
+  editingId = null; save(); render(); toast('已更新');
+}
+
+function cancelEdit() { editingId = null; render(); }
 
 // ── Court helpers ──
 function getCourtMember(memberId) {
@@ -938,12 +1013,30 @@ function render() {
   // Members list
   document.getElementById('mlist').innerHTML = members.length === 0
     ? '<div class="empty"><div class="ico">👥</div><p>還沒有球員</p></div>'
-    : members.map(m => `
-      <div class="mi${m.playing?'':' absent'}">
-        <div class="mcheck${m.playing?' on':''}" onclick="togglePresent('${m.id}')">${m.playing?'✓':''}</div>
-        <div class="mname">${m.name}${skillDots(m.skill)}</div>
-        <button class="mdel" onclick="removeMember('${m.id}')">×</button>
-      </div>`).join('');
+    : members.map(m => {
+      if (editingId === m.id) return `
+        <div class="mi editing">
+          <div class="edit-row">
+            <input id="edit-inp-${m.id}" class="edit-inp" type="text" value="${m.name}" maxlength="8"
+              onkeypress="if(event.key==='Enter')saveEdit()">
+            <div class="edit-skills">
+              <button class="edit-sk${editSkill===1?' active':''}" onclick="setEditSkill(1)">●</button>
+              <button class="edit-sk${editSkill===2?' active':''}" onclick="setEditSkill(2)">●●</button>
+              <button class="edit-sk${editSkill===3?' active':''}" onclick="setEditSkill(3)">●●●</button>
+            </div>
+          </div>
+          <div class="edit-actions">
+            <button class="edit-save" onclick="saveEdit()">儲存</button>
+            <button class="edit-cancel" onclick="cancelEdit()">取消</button>
+          </div>
+        </div>`;
+      return `
+        <div class="mi${m.playing?'':' absent'}">
+          <div class="mcheck${m.playing?' on':''}" onclick="togglePresent('${m.id}')">${m.playing?'✓':''}</div>
+          <div class="mname" onclick="startEdit('${m.id}')" style="cursor:pointer;flex:1">${m.name}${skillDots(m.skill)}</div>
+          <button class="mdel" onclick="removeMember('${m.id}')">×</button>
+        </div>`;
+    }).join('');
 }
 
 function renderStats() {
