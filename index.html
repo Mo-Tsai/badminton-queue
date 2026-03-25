@@ -617,7 +617,10 @@ function balancedAssign(pool, freeSlots) {
     pool.forEach((p, i) => { p._slot = Rslots[i]; });
     return;
   }
-  let bestDiff = Infinity, bestCombo = null;
+  // Mixing priority: among splits with skillDiff<=2, pick the one
+  // where teammates have played together the fewest times.
+  // Only fall back to minimum skillDiff when no split qualifies.
+  let best = null; // { combo, diff, ps }
   function combo(start, chosen) {
     if (chosen.length === Lcount) {
       const rest = pool.map((_,i)=>i).filter(i => !chosen.includes(i));
@@ -625,15 +628,29 @@ function balancedAssign(pool, freeSlots) {
         chosen.reduce((s,i) => s+pool[i].skill, 0) -
         rest.reduce((s,i) => s+pool[i].skill, 0)
       );
-      if (diff < bestDiff) { bestDiff=diff; bestCombo=[...chosen]; }
+      // Partner-repeat score: sum of times each same-team pair has played together
+      let ps = 0;
+      for (let a=0; a<chosen.length-1; a++)
+        for (let b=a+1; b<chosen.length; b++)
+          ps += (pool[chosen[a]].playedWith || {})[pool[chosen[b]].id] || 0;
+      for (let a=0; a<rest.length-1; a++)
+        for (let b=a+1; b<rest.length; b++)
+          ps += (pool[rest[a]].playedWith || {})[pool[rest[b]].id] || 0;
+      if (!best) { best = { combo:[...chosen], diff, ps }; return; }
+      const { diff:bd, ps:bp } = best;
+      // Prefer: skill diff <=2 with lowest partner repeat; fallback to min diff
+      if (diff<=2 && (bd>2 || ps<bp || (ps===bp && diff<bd)))
+        best = { combo:[...chosen], diff, ps };
+      else if (bd>2 && diff<bd)
+        best = { combo:[...chosen], diff, ps };
       return;
     }
     for (let i=start; i<n; i++) combo(i+1, [...chosen, i]);
   }
   combo(0, []);
-  if (!bestCombo) return;
-  bestCombo.forEach((idx,i) => { pool[idx]._slot = Lslots[i]; });
-  pool.map((_,i)=>i).filter(i=>!bestCombo.includes(i)).forEach((idx,i) => { pool[idx]._slot = Rslots[i]; });
+  if (!best) return;
+  best.combo.forEach((idx,i) => { pool[idx]._slot = Lslots[i]; });
+  pool.map((_,i)=>i).filter(i=>!best.combo.includes(i)).forEach((idx,i) => { pool[idx]._slot = Rslots[i]; });
 }
 
 function autoFill() {
@@ -715,6 +732,19 @@ function confirmEnd() {
   const cid = +modal.dataset.cid;
   const cp = getCourtPlayers(cid);
   const now = Date.now();
+  // Track which teammates played together (for mixing algorithm)
+  const left  = cp.filter(p => p.teamSlot <= 1);
+  const right = cp.filter(p => p.teamSlot >= 2);
+  [left, right].forEach(team => {
+    for (let a=0; a<team.length; a++) {
+      for (let b=a+1; b<team.length; b++) {
+        const mA = members.find(x => x.id === team[a].id);
+        const mB = members.find(x => x.id === team[b].id);
+        if (mA) { if (!mA.playedWith) mA.playedWith = {}; mA.playedWith[mB.id] = (mA.playedWith[mB.id]||0)+1; }
+        if (mB) { if (!mB.playedWith) mB.playedWith = {}; mB.playedWith[mA.id] = (mB.playedWith[mA.id]||0)+1; }
+      }
+    }
+  });
   cp.forEach(p => {
     const m = members.find(x => x.id === p.id);
     if (m) {
@@ -868,7 +898,7 @@ function renderStats() {
 
 function doReset() {
   if (!confirm('重置今日候場順序？所有人重新排隊')) return;
-  members.forEach(m => { m.lastPlayTime = 0; m.gamesPlayed = 0; });
+  members.forEach(m => { m.lastPlayTime = 0; m.gamesPlayed = 0; m.playedWith = {}; });
   totalGames = 0;
   save(); render(); toast('已重置');
 }
