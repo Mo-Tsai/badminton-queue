@@ -637,7 +637,27 @@ function balancedAssign(pool, freeSlots) {
 }
 
 function autoFill() {
-  const queue = getQueue(); let filled = 0;
+  const raw = getQueue();
+
+  // Shuffle within each gamesPlayed tier so the same group of players
+  // doesn't always get picked together when they share identical scores.
+  // Players with fewer games still have strict priority over those with more.
+  if (raw.length > 0) {
+    let start = 0;
+    while (start < raw.length) {
+      const tierGames = raw[start].gamesPlayed || 0;
+      let end = start;
+      while (end < raw.length && (raw[end].gamesPlayed || 0) === tierGames) end++;
+      // Fisher-Yates shuffle just this tier
+      for (let i = end - 1; i > start; i--) {
+        const j = start + Math.floor(Math.random() * (i - start + 1));
+        [raw[i], raw[j]] = [raw[j], raw[i]];
+      }
+      start = end;
+    }
+  }
+
+  const queue = raw; let filled = 0;
   [0,1].forEach(cid => {
     const cp = getCourtPlayers(cid);
     const needed = 4 - cp.length;
