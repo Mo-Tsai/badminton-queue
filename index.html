@@ -643,6 +643,11 @@ function autoFill() {
     const needed = 4 - cp.length;
     if (needed <= 0 || queue.length < needed) return;
     const pool = queue.splice(0, needed);
+    // Shuffle pool so players who finished together don't always form the same teams
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
     const usedSlots = courtState[cid].map(x => x.teamSlot);
     const freeSlots = [0,1,2,3].filter(s => !usedSlots.includes(s));
     balancedAssign(pool, freeSlots);
