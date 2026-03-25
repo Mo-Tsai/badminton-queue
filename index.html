@@ -48,18 +48,20 @@ body{
 /* ── Header ── */
 header{
   background:var(--surface);
-  padding:16px 18px 0;
+  padding:16px 18px 16px;
   position:sticky;top:0;z-index:100;
   text-align:center;
+  border-radius:0 0 22px 22px;
+  box-shadow:0 0 0 3px var(--court-line),0 6px 16px rgba(28,20,8,0.12);
 }
 header h1{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.02em}
 
-/* ── Tabs (forms bottom of header card) ── */
+/* ── Tabs (independent panel below header) ── */
 .tabs{
-  display:flex;background:var(--surface);padding:0 16px;
-  border-radius:0 0 22px 22px;
+  display:flex;justify-content:center;background:var(--surface);padding:0 16px;
+  border-radius:22px;
   box-shadow:0 0 0 3px var(--court-line),0 6px 16px rgba(28,20,8,0.12);
-  margin-bottom:4px;
+  margin:8px 14px 4px;
 }
 .tab{
   padding:10px 14px;
@@ -573,7 +575,7 @@ function renderCourts() {
   if (!track) return;
   track.innerHTML = courtIds().map(cid => `
     <div class="court" id="court-${cid}">
-      <div class="cl">${COURT_NAMES[cid]} 場</div>
+      <div class="cl">Badminton ${COURT_NAMES[cid]}</div>
       <div class="slots">
         <div class="slot L" id="s${cid}-0"><span class="sn">空位</span></div>
         <div class="slot R" id="s${cid}-2"><span class="sn">空位</span></div>
