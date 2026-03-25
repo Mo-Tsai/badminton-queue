@@ -53,12 +53,6 @@ header{
   text-align:center;
 }
 header h1{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.02em}
-header p{
-  font-size:10px;color:var(--ink3);margin-top:4px;
-  font-family:ui-monospace,monospace;
-  text-transform:uppercase;letter-spacing:0.08em;
-  text-align:center;
-}
 
 /* ── Tabs (forms bottom of header card) ── */
 .tabs{
@@ -77,6 +71,20 @@ header p{
 .tab.active{color:var(--ink);border-bottom-color:var(--green)}
 .sec{display:none;padding:14px}
 .sec.active{display:block}
+
+/* ── Stat bar ── */
+.stat-bar{
+  margin:10px 14px 0;
+  background:var(--surface);
+  border-radius:14px;
+  padding:9px 16px;
+  text-align:center;
+  font-size:10px;font-weight:600;
+  color:var(--ink2);
+  font-family:ui-monospace,monospace;
+  text-transform:uppercase;letter-spacing:0.08em;
+  box-shadow:0 0 0 2px var(--court-line),inset 0 0 0 1px var(--ring);
+}
 
 /* ── Court controls ── */
 .court-wrap{margin-bottom:14px}
@@ -437,13 +445,13 @@ input[type=text]::placeholder{color:var(--ink4)}
 <body>
 <header>
   <h1>🏸 羽球排隊系統</h1>
-  <p id="stxt">就緒</p>
 </header>
 <div class="tabs">
   <div class="tab active" onclick="switchTab('court')">場地</div>
   <div class="tab" onclick="switchTab('members')">球員</div>
   <div class="tab" onclick="switchTab('stats')">統計</div>
 </div>
+<div class="stat-bar"><span id="stxt">就緒</span></div>
 
 <!-- COURT TAB -->
 <div class="sec active" id="tab-court">
